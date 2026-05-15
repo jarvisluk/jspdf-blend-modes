@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.1
+
+### Patch Changes
+
+- b17e697: Internal hardening: stricter jsPDF compatibility check in
+  `src/internal-api.ts` (early actionable error if the `internal` events
+  surface is renamed by a future jsPDF major), and a clearer error from
+  `renderSvgWithBlendModes` when the SVG is not mounted in the document.
+  DOM-free contract of the `jspdf-blend-modes/gstate` subpath is now
+  enforced by a Node-environment SSR smoke test. No public API changes.
+
 All notable changes to this project will be documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),

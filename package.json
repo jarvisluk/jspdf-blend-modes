@@ -1,6 +1,6 @@
 {
   "name": "jspdf-blend-modes",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Real PDF 1.4 blend modes for jsPDF and svg2pdf.js — Multiply, Screen, Overlay, … and round-tripping CSS mix-blend-mode from SVG.",
   "license": "MIT",
   "type": "module",
@@ -80,14 +80,19 @@
       "path": "dist/gstate.js",
       "limit": "5 KB",
       "gzip": true,
-      "ignore": ["jspdf"]
+      "ignore": [
+        "jspdf"
+      ]
     },
     {
       "name": "index (full library, ESM)",
       "path": "dist/index.js",
       "limit": "12 KB",
       "gzip": true,
-      "ignore": ["jspdf", "svg2pdf.js"]
+      "ignore": [
+        "jspdf",
+        "svg2pdf.js"
+      ]
     }
   ],
   "peerDependencies": {
