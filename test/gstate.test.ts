@@ -1,3 +1,13 @@
+// @vitest-environment node
+//
+// gstate.ts is the DOM-free entry point of this library — Node/SSR consumers
+// import it through the `jspdf-blend-modes/gstate` subpath. We deliberately
+// run these tests in Node (no happy-dom) to enforce that contract: if any
+// future change accidentally pulls `document`, `window`, `getComputedStyle`,
+// etc. into this module's import graph, this test file will fail to even
+// load. See also `test/gstate.ssr-smoke.test.ts` for a stronger "no DOM
+// globals leak through" check.
+
 import { describe, expect, it } from "vitest";
 import { jsPDF } from "jspdf";
 import {

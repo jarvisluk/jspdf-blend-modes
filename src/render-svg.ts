@@ -107,6 +107,40 @@ function ensurePdfHasSvg(pdf: jsPDF): asserts pdf is jsPDF & PdfWithSvg {
 }
 
 /**
+ * `renderSvgWithBlendModes` relies on `getComputedStyle()` to read the
+ * effective `mix-blend-mode` of every candidate element, and on
+ * `getBoundingClientRect()` (called inside svg2pdf.js) to lay out the
+ * isolated render passes. Both yield empty / zero values for nodes that
+ * are not in the document tree, which would silently produce a PDF where
+ * blend elements either don't blend or don't render at all.
+ *
+ * We surface that as a single, actionable error up-front so the caller
+ * gets a clear migration path instead of debugging an invisible accent.
+ */
+function ensureSvgIsMounted(svg: SVGSVGElement): void {
+  const ownerDoc = svg.ownerDocument;
+  if (!ownerDoc || !ownerDoc.defaultView) {
+    throw new Error(
+      "[jspdf-blend-modes] `renderSvgWithBlendModes` requires an SVG that owns a Document " +
+        "with an associated window (browser-like environment). For Node/SSR usage, " +
+        "import the low-level `jspdf-blend-modes/gstate` API instead."
+    );
+  }
+  const rootNode = svg.getRootNode();
+  // A connected element has the document itself (or a containing ShadowRoot
+  // attached to one) as its root. happy-dom + jsdom + browsers all agree on
+  // `Node.isConnected` semantics here.
+  if (!svg.isConnected || rootNode === svg) {
+    throw new Error(
+      "[jspdf-blend-modes] the SVG passed to `renderSvgWithBlendModes` must be " +
+        "mounted in the document so `getComputedStyle()` and `getBoundingClientRect()` " +
+        "return meaningful values. Append it to `document.body` (off-screen if needed) " +
+        "before calling, or render it in your UI normally."
+    );
+  }
+}
+
+/**
  * Resolves an element-set + per-element mode pair from the user's selector.
  * Precondition: the SVG is in `document` (so `getComputedStyle` works).
  */
@@ -214,6 +248,7 @@ export async function renderSvgWithBlendModes(
 ): Promise<void> {
   await ensureSvg2Pdf(opts.svg2pdfModule);
   ensurePdfHasSvg(pdf);
+  ensureSvgIsMounted(svg);
 
   const placement = { x: opts.x, y: opts.y, width: opts.width, height: opts.height };
   const groupingStrategy = opts.groupingStrategy ?? "by-mode";

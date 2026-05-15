@@ -232,6 +232,21 @@ describe("renderSvgWithBlendModes", () => {
     expect(txt).not.toMatch(/\/BM\s*\/Multiply/);
   });
 
+  it("throws a clear error when the SVG is not mounted in the document", async () => {
+    const detached = buildFixtureSvg(); // never appended to document.body
+    const pdf = makePdf();
+
+    await expect(
+      renderSvgWithBlendModes(pdf, detached, {
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+        blendSelector: ".accent"
+      })
+    ).rejects.toThrow(/must be\s+mounted in the document/);
+  });
+
   it("removes parked isolated SVGs from document.body after the pass", async () => {
     const svg = buildFixtureSvg();
     document.body.appendChild(svg);

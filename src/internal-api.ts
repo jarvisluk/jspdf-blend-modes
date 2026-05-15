@@ -47,9 +47,45 @@ interface JsPDFLike {
  * Every other module imports `getInternal` instead of casting directly. If
  * a future jsPDF version renames `events.subscribe` or `newObject`, this is
  * the only file that needs to change.
+ *
+ * Performs a runtime shape sanity check before returning, so that on an
+ * incompatible jsPDF version the user sees a single, actionable error
+ * (`[jspdf-blend-modes] incompatible jsPDF instance: ...`) instead of
+ * a confusing late-bound `TypeError: undefined is not a function` from
+ * deep inside the GState pipeline. The check is O(1) — a few `typeof`
+ * lookups on properties we'd touch anyway.
  */
 export function getInternal(pdf: jsPDF): JsPDFInternal {
-  return (pdf as unknown as JsPDFLike).internal;
+  const internal = (pdf as unknown as JsPDFLike).internal as JsPDFInternal | undefined;
+  assertCompatibleInternal(internal);
+  return internal;
+}
+
+function assertCompatibleInternal(
+  internal: JsPDFInternal | undefined
+): asserts internal is JsPDFInternal {
+  if (!internal || typeof internal !== "object") {
+    throw new Error(
+      "[jspdf-blend-modes] incompatible jsPDF instance: missing `internal` object. " +
+        "This library targets jsPDF >=2.5.0 <6.0.0; received an unrecognised build."
+    );
+  }
+  const required: Array<keyof JsPDFInternal> = ["newObject", "write", "out", "events"];
+  const bag = internal as unknown as Record<string, unknown>;
+  for (const key of required) {
+    if (typeof bag[key as string] === "undefined") {
+      throw new Error(
+        `[jspdf-blend-modes] incompatible jsPDF instance: \`internal.${String(key)}\` is missing. ` +
+          "This library targets jsPDF >=2.5.0 <6.0.0; please file an issue with your jsPDF version."
+      );
+    }
+  }
+  if (typeof internal.events?.subscribe !== "function") {
+    throw new Error(
+      "[jspdf-blend-modes] incompatible jsPDF instance: `internal.events.subscribe` is not a function. " +
+        "This library targets jsPDF >=2.5.0 <6.0.0; please file an issue with your jsPDF version."
+    );
+  }
 }
 
 /**
