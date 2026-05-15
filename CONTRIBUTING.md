@@ -16,7 +16,7 @@ Requirements:
 - npm 9+.
 
 ```bash
-git clone https://github.com/JarvisLuk/jspdf-blend-modes.git
+git clone https://github.com/jarvisluk/jspdf-blend-modes.git
 cd jspdf-blend-modes
 npm install
 

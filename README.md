@@ -1,6 +1,6 @@
 # jspdf-blend-modes
 
-[![CI](https://github.com/JarvisLuk/jspdf-blend-modes/actions/workflows/ci.yml/badge.svg)](https://github.com/JarvisLuk/jspdf-blend-modes/actions/workflows/ci.yml)
+[![CI](https://github.com/jarvisluk/jspdf-blend-modes/actions/workflows/ci.yml/badge.svg)](https://github.com/jarvisluk/jspdf-blend-modes/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/jspdf-blend-modes.svg)](https://www.npmjs.com/package/jspdf-blend-modes)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/jspdf-blend-modes?label=gzip)](https://bundlephobia.com/package/jspdf-blend-modes)
 [![license](https://img.shields.io/npm/l/jspdf-blend-modes.svg)](./LICENSE)

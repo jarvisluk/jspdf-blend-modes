@@ -7,7 +7,11 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  id-token: write # required for npm provenance
+  # `id-token: write` is required both for npm provenance and for npm Trusted
+  # Publishing (OIDC) — npm CLI will pick up the OIDC token automatically when
+  # the package has a trusted publisher configured on the registry side.
+  # See https://docs.npmjs.com/trusted-publishers
+  id-token: write
 
 concurrency:
   group: release-${{ github.workflow }}-${{ github.ref }}
@@ -26,9 +30,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Trusted publishing requires npm CLI >= 11.5.1, which currently
+          # only ships with Node >= 22.14. Node 22 LTS is the safe floor.
+          node-version: "22.14.0"
           cache: npm
           registry-url: https://registry.npmjs.org
+
+      # Even Node 22.14 ships an npm older than 11.5.1, so we bump npm in
+      # the runner before publishing. This is a no-op for the build/test
+      # steps but is the difference between OIDC working and not.
+      - name: Ensure npm >= 11.5.1 for trusted publishing
+        run: npm install -g npm@latest
 
       - name: Install
         run: npm ci
@@ -58,4 +70,8 @@ jobs:
           title: "chore(release): version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # NPM_TOKEN is kept temporarily as a fallback path while the
+          # Trusted Publisher configuration on npmjs.com is being verified.
+          # Once one OIDC publish has succeeded, remove this env line, revoke
+          # the token, and delete the NPM_TOKEN secret from this repo.
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

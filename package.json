@@ -23,11 +23,11 @@
   "author": "Jarvis Luk <lu_junrong@outlook.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JarvisLuk/jspdf-blend-modes.git"
+    "url": "git+https://github.com/jarvisluk/jspdf-blend-modes.git"
   },
-  "homepage": "https://github.com/JarvisLuk/jspdf-blend-modes#readme",
+  "homepage": "https://github.com/jarvisluk/jspdf-blend-modes#readme",
   "bugs": {
-    "url": "https://github.com/JarvisLuk/jspdf-blend-modes/issues"
+    "url": "https://github.com/jarvisluk/jspdf-blend-modes/issues"
   },
   "engines": {
     "node": ">=18.0.0"
