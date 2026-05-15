@@ -13,6 +13,8 @@
         --accent: #ffb84a;
         --card: #18181d;
         --border: #2a2a31;
+        --good: #58c97a;
+        --bad: #e8625b;
       }
       * { box-sizing: border-box; }
       body {
@@ -32,21 +34,34 @@
         letter-spacing: -0.01em;
       }
       header p { margin: 0; color: var(--muted); max-width: 60ch; }
+      header p code {
+        background: var(--card);
+        padding: 1px 6px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
+      header a { color: var(--accent); }
       main {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 2fr;
         gap: 24px;
         padding: 24px;
       }
-      @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+      @media (max-width: 1024px) { main { grid-template-columns: 1fr; } }
       .card {
         background: var(--card);
         border: 1px solid var(--border);
         border-radius: 8px;
         padding: 16px;
       }
-      .card h2 { margin: 0 0 12px; font-size: 14px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--muted); }
-      .preview {
+      .card h2 {
+        margin: 0 0 12px;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .preview-source {
         background: #fff;
         border-radius: 4px;
         aspect-ratio: 1 / 1;
@@ -54,7 +69,7 @@
         place-items: center;
         overflow: hidden;
       }
-      .preview svg { width: 100%; height: 100%; display: block; }
+      .preview-source svg { width: 100%; height: 100%; display: block; }
       .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
       button {
         appearance: none;
@@ -69,43 +84,158 @@
       }
       button.secondary { background: transparent; color: var(--fg); border: 1px solid var(--border); }
       button:disabled { opacity: 0.5; cursor: not-allowed; }
-      pre {
+
+      .pdf-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      @media (max-width: 720px) { .pdf-grid { grid-template-columns: 1fr; } }
+      .pdf-cell {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .pdf-cell h3 {
         margin: 0;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .pdf-cell .badge {
+        display: inline-block;
+        padding: 1px 6px;
+        font-size: 10px;
+        border-radius: 999px;
+        margin-left: 6px;
+        font-weight: 700;
+      }
+      .badge-bad { background: rgba(232, 98, 91, 0.18); color: var(--bad); }
+      .badge-good { background: rgba(88, 201, 122, 0.18); color: var(--good); }
+      .pdf-canvas-wrap {
+        background: #fff;
+        border-radius: 4px;
+        aspect-ratio: 1 / 1;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        position: relative;
+      }
+      .pdf-canvas-wrap canvas {
+        max-width: 100%;
+        max-height: 100%;
+        display: block;
+      }
+      .pdf-canvas-wrap .placeholder {
+        color: var(--muted);
+        font-size: 12px;
+        padding: 16px;
+        text-align: center;
+      }
+      .pdf-meta {
+        font-size: 11px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .pdf-meta a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .pdf-meta a:hover { text-decoration: underline; }
+
+      pre#log {
+        margin: 16px 0 0;
         padding: 8px 10px;
         background: #0a0a0d;
         border-radius: 6px;
         white-space: pre-wrap;
         word-break: break-word;
         color: var(--muted);
-        max-height: 220px;
+        max-height: 200px;
         overflow: auto;
         font-size: 12px;
       }
+      footer {
+        padding: 16px 24px 32px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      footer a { color: var(--accent); }
     </style>
   </head>
   <body>
     <header>
       <h1>jspdf-blend-modes</h1>
       <p>
-        Round-trip CSS <code>mix-blend-mode</code> from a live SVG into a real
-        PDF 1.4 blend-mode PDF, via jsPDF + svg2pdf.js.
+        Three exports of the same SVG, rendered side by side with
+        <a href="https://mozilla.github.io/pdf.js/" target="_blank" rel="noreferrer">pdf.js</a>.
+        The accent letter uses CSS <code>mix-blend-mode: multiply</code>;
+        only the runs that go through this library reproduce the blend in the
+        PDF.
       </p>
     </header>
     <main>
       <section class="card">
-        <h2>Live preview</h2>
-        <div id="preview" class="preview"></div>
+        <h2>Source SVG (live)</h2>
+        <div id="preview-source" class="preview-source"></div>
         <div class="actions">
-          <button id="btn-naive" class="secondary">Naive svg2pdf (broken)</button>
-          <button id="btn-low">Low-level withBlendMode</button>
-          <button id="btn-high">renderSvgWithBlendModes</button>
+          <button id="btn-render-all">Run all three exports</button>
+          <button id="btn-naive" class="secondary">Naive only</button>
+          <button id="btn-low" class="secondary">Low-level only</button>
+          <button id="btn-high" class="secondary">High-level only</button>
+        </div>
+        <pre id="log">Click a button to export a PDF and preview it.</pre>
+      </section>
+
+      <section class="card">
+        <h2>PDF previews</h2>
+        <div class="pdf-grid">
+          <article class="pdf-cell" data-cell="naive">
+            <h3>Naive svg2pdf<span class="badge badge-bad">broken</span></h3>
+            <div class="pdf-canvas-wrap">
+              <div class="placeholder">No PDF rendered yet.</div>
+            </div>
+            <div class="pdf-meta">
+              <span class="status">—</span>
+              <a class="download" hidden>Download</a>
+            </div>
+          </article>
+
+          <article class="pdf-cell" data-cell="low">
+            <h3>withBlendMode<span class="badge badge-good">low-level</span></h3>
+            <div class="pdf-canvas-wrap">
+              <div class="placeholder">No PDF rendered yet.</div>
+            </div>
+            <div class="pdf-meta">
+              <span class="status">—</span>
+              <a class="download" hidden>Download</a>
+            </div>
+          </article>
+
+          <article class="pdf-cell" data-cell="high">
+            <h3>renderSvgWithBlendModes<span class="badge badge-good">high-level</span></h3>
+            <div class="pdf-canvas-wrap">
+              <div class="placeholder">No PDF rendered yet.</div>
+            </div>
+            <div class="pdf-meta">
+              <span class="status">—</span>
+              <a class="download" hidden>Download</a>
+            </div>
+          </article>
         </div>
       </section>
-      <section class="card">
-        <h2>Log</h2>
-        <pre id="log">Click a button to export a PDF.</pre>
-      </section>
     </main>
+    <footer>
+      <a href="https://github.com/JarvisLuk/jspdf-blend-modes" target="_blank" rel="noreferrer">GitHub</a>
+      ·
+      <a href="https://www.npmjs.com/package/jspdf-blend-modes" target="_blank" rel="noreferrer">npm</a>
+    </footer>
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

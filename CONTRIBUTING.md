@@ -34,6 +34,20 @@ npm install
 npm run dev
 ```
 
+## Optional: enable the pre-commit hook
+
+The repository ships a zero-dependency pre-commit hook in `.githooks/` that
+mirrors what CI checks: Prettier on staged TS/JSON/YAML/Markdown, ESLint on
+staged TS files, and a full `tsc --noEmit` whenever TypeScript changes. Opt
+in once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Bypass with `git commit --no-verify` when you really need to (e.g. an
+in-progress WIP branch).
+
 ## Useful scripts
 
 | Script                   | Purpose                                             |

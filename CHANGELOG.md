@@ -21,6 +21,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   as a `devDependency`, so day-to-day `npm ci` stays light.
 - README badges, install instructions, expanded **Limitations** section,
   and a **Migrating from a manual ExtGState workaround** guide.
+- Demo (`demo/browser/`) now renders each generated PDF inline with
+  pdfjs-dist, so the broken naive svg2pdf export and the two library
+  exports are visible side by side without leaving the page.
+- `.github/workflows/pages.yml` builds the demo on every push to `main`
+  and deploys it to GitHub Pages, giving the README a working live demo
+  link.
+- Optional zero-dependency pre-commit hook (`.githooks/pre-commit`) that
+  runs Prettier, ESLint, and `tsc --noEmit` on staged files. Enable per
+  clone with `git config core.hooksPath .githooks`. CONTRIBUTING covers
+  the opt-in flow.
 
 ### Changed
 

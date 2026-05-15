@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Optional pre-commit gate. Enable with:
+#
+#     git config core.hooksPath .githooks
+#
+# Runs the same checks CI runs, but only on staged files where it is cheap
+# to do so. Skipped when no relevant files are staged.
+
+set -euo pipefail
+
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+
+# Collect staged paths once. Diff against HEAD if it exists, otherwise
+# against the empty tree (initial commit).
+if git rev-parse --verify --quiet HEAD >/dev/null; then
+  diff_base="HEAD"
+else
+  diff_base=$(git hash-object -t tree /dev/null)
+fi
+staged=$(git diff --cached --name-only --diff-filter=ACMR "$diff_base")
+
+if [ -z "$staged" ]; then
+  exit 0
+fi
+
+filter() {
+  printf '%s\n' "$staged" | grep -E "$1" || true
+}
+
+# Format TypeScript inside src/test if any of those changed. Run prettier
+# only on the staged files for speed; re-add them so the formatted version
+# ends up in the commit.
+ts_files=$(filter '^(src|test)/.*\.ts$')
+if [ -n "$ts_files" ]; then
+  echo "[pre-commit] prettier on staged ts files…"
+  printf '%s\n' "$ts_files" | xargs npx --no-install prettier --write
+  printf '%s\n' "$ts_files" | xargs git add
+fi
+
+# Lint TS (cheap; eslint already only sees src/test in our config).
+if [ -n "$ts_files" ]; then
+  echo "[pre-commit] eslint on staged ts files…"
+  printf '%s\n' "$ts_files" | xargs npx --no-install eslint --max-warnings=0
+fi
+
+# Typecheck the whole project — cross-file type errors are the main thing
+# we want to catch before pushing. tsc is fast on this codebase (<2s).
+if [ -n "$ts_files" ]; then
+  echo "[pre-commit] tsc --noEmit…"
+  npx --no-install tsc --noEmit
+fi
+
+# JSON / YAML / Markdown reformat too, where it's safe.
+fmt_other=$(filter '\.(json|ya?ml|md)$' | grep -v '^demo/' || true)
+if [ -n "$fmt_other" ]; then
+  echo "[pre-commit] prettier on staged config/markdown…"
+  printf '%s\n' "$fmt_other" | xargs npx --no-install prettier --write
+  printf '%s\n' "$fmt_other" | xargs git add
+fi
+
+exit 0

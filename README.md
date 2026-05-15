@@ -160,6 +160,13 @@ Behavioural notes during migration:
 
 ## Demo
 
+**Live**: <https://jarvisluk.github.io/jspdf-blend-modes/> — runs all three
+exports of the same SVG side by side and renders each generated PDF inline
+with [pdf.js](https://mozilla.github.io/pdf.js/), so you can see the
+multiply blend land or fail without leaving the page.
+
+**Local**:
+
 ```bash
 npm install && cd demo/browser && npm install && npm run dev
 ```
