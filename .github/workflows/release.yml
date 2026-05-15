@@ -70,8 +70,9 @@ jobs:
           title: "chore(release): version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # NPM_TOKEN is kept temporarily as a fallback path while the
-          # Trusted Publisher configuration on npmjs.com is being verified.
-          # Once one OIDC publish has succeeded, remove this env line, revoke
-          # the token, and delete the NPM_TOKEN secret from this repo.
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # No NPM_TOKEN: this workflow publishes via npm Trusted Publishing
+          # (OIDC). The `id-token: write` permission above lets the npm CLI
+          # exchange the workflow's GitHub OIDC token for a short-lived
+          # publish credential. To re-introduce a token fallback (e.g. for
+          # an emergency hand-publish), add NPM_TOKEN here and recreate the
+          # secret — but prefer fixing the OIDC config on npmjs.com instead.
