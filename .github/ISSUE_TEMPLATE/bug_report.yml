@@ -1,0 +1,104 @@
+name: Bug report
+description: Report a reproducible bug in jspdf-blend-modes
+title: "fix: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please include a minimal reproduction —
+        ideally using the `demo/browser` project or a small standalone snippet.
+
+        For security-sensitive reports, do not use this form. See `SECURITY.md`.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the observed behaviour and why it is wrong.
+      placeholder: "Expected Multiply to appear as `/BM /Multiply`, but..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: |
+        Paste a minimal code snippet, a repository link, or exact steps using
+        `demo/browser`. Include the SVG/PDF-generation code if relevant.
+      render: ts
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: What happened instead? Include thrown errors or PDF byte snippets if useful.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: api
+    attributes:
+      label: API surface
+      description: Which API is affected?
+      options:
+        - High-level `renderSvgWithBlendModes`
+        - Low-level `registerBlendMode` / `withBlendMode`
+        - Utility export (`hideElements`, `mirrorBaselines`, `buildIsolatedSvg`, etc.)
+        - Build/package exports
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: jspdf-blend-modes version
+      placeholder: "0.2.0"
+    validations:
+      required: true
+
+  - type: input
+    id: jspdf-version
+    attributes:
+      label: jsPDF version
+      placeholder: "2.5.2"
+    validations:
+      required: true
+
+  - type: input
+    id: svg2pdf-version
+    attributes:
+      label: svg2pdf.js version
+      placeholder: "2.5.0 or N/A"
+    validations:
+      required: false
+
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime
+      description: Browser, Node, bundler, OS.
+      placeholder: "Chrome 124 + Vite 5 on macOS / Node 20"
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Screenshots, generated PDF, byte-stream excerpts, related issues, etc.
+    validations:
+      required: false

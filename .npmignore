@@ -1,0 +1,13 @@
+src
+test
+demo
+.cursor
+.github
+.eslintrc.cjs
+.prettierrc.json
+tsup.config.ts
+tsconfig.json
+vitest.config.ts
+coverage
+*.tgz
+.DS_Store

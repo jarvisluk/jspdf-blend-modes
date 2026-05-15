@@ -1,0 +1,70 @@
+name: Feature request
+description: Suggest a new capability or API improvement
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement. Please describe the use case
+        first; proposed APIs are welcome, but the problem matters most.
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What are you trying to build, and what is hard today?
+      placeholder: "I need to export an SVG that uses..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: If you have an API or implementation idea, describe it here.
+      render: ts
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds or other APIs you've tried.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: api
+    attributes:
+      label: API surface
+      description: Which area would this affect?
+      options:
+        - High-level `renderSvgWithBlendModes`
+        - Low-level `registerBlendMode` / `withBlendMode`
+        - Utility export (`hideElements`, `mirrorBaselines`, `buildIsolatedSvg`, etc.)
+        - Build/package exports
+        - Documentation/demo only
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility considerations
+      description: |
+        Does this require a new runtime dependency, jsPDF/svg2pdf.js version,
+        browser API, or a breaking API change?
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Links, SVG samples, screenshots, related issues, PDF spec references, etc.
+    validations:
+      required: false

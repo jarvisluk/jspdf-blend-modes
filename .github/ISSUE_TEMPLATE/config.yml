@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/your-org/jspdf-blend-modes/security/policy
+    about: Please do not open public issues for security reports. See SECURITY.md.
+  - name: jsPDF upstream
+    url: https://github.com/parallax/jsPDF/issues
+    about: For bugs in jsPDF itself rather than jspdf-blend-modes.
+  - name: svg2pdf.js upstream
+    url: https://github.com/yWorks/svg2pdf.js/issues
+    about: For bugs in svg2pdf.js itself rather than jspdf-blend-modes.
