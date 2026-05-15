@@ -8,7 +8,7 @@
 Real **PDF 1.4 blend modes** for [jsPDF](https://github.com/parallax/jsPDF) and
 [svg2pdf.js](https://github.com/yWorks/svg2pdf.js) — all 16 modes, plus a
 one-call helper that round-trips CSS `mix-blend-mode` from a live SVG into
-the PDF. Closes [svg2pdf.js#194](https://github.com/yWorks/svg2pdf.js/issues/194)
+the PDF. Related to [svg2pdf.js#194](https://github.com/yWorks/svg2pdf.js/issues/194)
 and [jsPDF#1255](https://github.com/parallax/jsPDF/issues/1255).
 
 ## Install
