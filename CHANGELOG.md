@@ -11,6 +11,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Project contribution guidelines, pull request template, issue templates,
   code of conduct, and security policy.
+- GitHub Actions CI matrix: Node 18 / 20 / 22 × jsPDF 2.5 / 3.x / 4.x, plus
+  a single static lane (lint + typecheck + build + size + DOM-free import
+  check on the `gstate` subpath).
+- `size-limit` budget enforced in CI: `gstate` (DOM-free) ≤ 5 KB gzip,
+  full library entry ≤ 12 KB gzip. Current numbers: 1.19 KB and 3.38 KB.
+- Changesets workflow (`.changeset/`, `release.yml`) for versioning and
+  publishing. The `@changesets/cli` is invoked through `npx`, not pinned
+  as a `devDependency`, so day-to-day `npm ci` stays light.
+- README badges, install instructions, expanded **Limitations** section,
+  and a **Migrating from a manual ExtGState workaround** guide.
+
+### Changed
+
+- `package.json`: real `repository` / `homepage` / `bugs` URLs, `author`,
+  `engines.node >=18`, `publishConfig` for npm provenance, and an
+  expanded `keywords` set for npm discoverability.
+- `src/internal-api.ts`: `getInternal()` now performs an O(1) shape sanity
+  check on the jsPDF `internal` surface and throws a single actionable
+  `[jspdf-blend-modes]` error on incompatible jsPDF versions, instead of
+  failing late with a confusing `TypeError`.
+- `src/render-svg.ts`: detect a detached SVG up-front and throw an
+  actionable error pointing at `document.body` / the `gstate` subpath,
+  preventing the silent "no blend rendered" trap.
+- Test environment: `gstate.test.ts` now runs in `node` mode (no
+  happy-dom) so the DOM-free contract of the `gstate` subpath is
+  enforced from CI. New `gstate.ssr-smoke.test.ts` statically asserts no
+  DOM globals appear in the source files reachable through that subpath.
 
 ## [0.2.0] — 2026-05-15
 

@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Single-shot lane: typecheck + lint + build + size-limit. These don't
+  # depend on the runtime jsPDF version so we only run them once on the
+  # baseline Node version to keep CI cheap.
+  static:
+    name: static (lint + typecheck + build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Verify gstate subpath imports cleanly under Node (DOM-free)
+        run: node --input-type=module -e "import('./dist/gstate.js').then(m => { if (typeof m.registerBlendMode !== 'function') { throw new Error('gstate subpath missing registerBlendMode'); } })"
+      - name: Check bundle size
+        run: npm run size
+
+  # Test lane: matrix across supported Node and jsPDF major versions.
+  # The jsPDF version is overridden after the lockfile install so we keep
+  # deterministic devDependencies elsewhere but exercise each major.
+  test:
+    name: test (Node ${{ matrix.node }} × jsPDF ${{ matrix.jspdf }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22]
+        jspdf: ["2.5.2", "3.0.4", "4.2.1"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - name: Pin jsPDF to ${{ matrix.jspdf }}
+        run: npm install --no-save --no-audit --no-fund jspdf@${{ matrix.jspdf }}
+      - run: npm test

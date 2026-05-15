@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write # required for npm provenance
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: changesets release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: npm ci
+
+      # Build before either publishing or opening the version PR so the
+      # changeset publish step has dist/ ready and the PR's lockfile keeps
+      # in sync with any new size-limit numbers.
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      # Make the changesets CLI directly available so changesets/action can
+      # invoke its `version` / `publish` commands without depending on a
+      # devDependency entry in this repo.
+      - name: Install changesets CLI
+        run: npm install --no-save --no-audit --no-fund @changesets/cli@^2.27.7
+
+      - name: Create release PR or publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: npm run version-packages
+          publish: npm run release
+          commit: "chore(release): version packages"
+          title: "chore(release): version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
